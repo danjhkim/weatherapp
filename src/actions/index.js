@@ -27,14 +27,6 @@ export const getWeather = (id) => async (dispatch) => {
 
 //combined weather and city 
 export const combinedWeather = (city) => async (dispatch, getState) => {
-    try {
-        await dispatch(getCity(city));
-        await dispatch(getWeather(getState().cities[city]));
-    } catch (err) {
-        if (err.message === "Failed to fetch") {
-            console.log('fetch has failed')
-        } else {
-            console.log('Could not retrieve information');
-        }
-    };
+    await dispatch(getCity(city));
+    await dispatch(getWeather(getState().cities[city]));
 }
