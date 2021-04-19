@@ -3,10 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap'
 import gsap, { TweenMax } from "gsap";
 
-import { combinedWeather } from '../actions/'
+import { combinedWeather, turnOff, turnOn } from '../actions/'
 import day from '../images/day.svg'
 import night from '../images/night.svg'
-import * as ALL from "../images/icons/";
+import * as ALL from "../images/icons/"
+import logo from '../images/logo.png'
 
 gsap.config({
     autoSleep: 60,
@@ -22,39 +23,23 @@ const WeatherFrame = () => {
     const circleIcon = useRef()
     const mainBox = useRef()
     const littleBox = useRef()
-    const [show, setShow] = useState(false);
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const showModal = useSelector(state => state.getSwitch)
+
 
     const submitWeather = (e) => {
         e.preventDefault()
         const city = e.target.children[1].value
-        const cityCapitalized = city[0].toUpperCase() + city.slice(1).toLowerCase().trim()
-        if (weathers === null) {
-            dispatch(combinedWeather(cityCapitalized)).catch(err => {
-                if (err.message === "Failed to fetch") {
-                    console.log('fetch has failed')
-                } else {
-                    console.log('Could not retrieve information');
-                }
-                handleShow()
+        // const cityCapitalized = city[0].toUpperCase() + city.slice(1).toLowerCase().trim()
+        if (weathers === null || weathers[city] === undefined) {
+            dispatch(combinedWeather(city)).then(() => {
+                setCity(city)
+                e.target.children[1].value = ""
+            }).catch(err => {
+                dispatch(turnOn())
             })
-            setCity(cityCapitalized)
-            e.target.children[1].value = ""
-        } else if (weathers[cityCapitalized] === undefined) {
-            dispatch(combinedWeather(cityCapitalized)).catch(err => {
-                if (err.message === "Failed to fetch") {
-                    console.log('fetch has failed')
-                } else {
-                    console.log('Could not retrieve information');
-                }
-                handleShow()
-            })
-            setCity(cityCapitalized)
-            e.target.children[1].value = ""
         } else {
-            setCity(cityCapitalized)
+            setCity(city)
             e.target.children[1].value = ""
         }
     };
@@ -87,40 +72,43 @@ const WeatherFrame = () => {
         if (weathers === null || weathers[city] === undefined) {
             return
         } else {
-            TweenMax.to(circleIcon.current, 1.5, { rotation: 360, repeat: 1, ease: "Linear.easeNone", delay: 0.8 })
             TweenMax.fromTo(mainBox.current, 0.6, { y: 80, opacity: 0 }, { y: 0, opacity: 1 })
 
-            TweenMax.fromTo(littleBox.current, 0.6, { y: 80, opacity: 0 }, { y: 0, delay: 1.5, opacity: 1, ease: "Back.easeOut" })
+            TweenMax.fromTo(littleBox.current, 0.6, { y: 80, opacity: 0 }, { y: 0, delay: .5, opacity: 1, ease: "Back.easeOut" })
         }
+        // eslint-disable-next-line
     }, [renderWeather])
 
     return (
         <>
-            <Button variant="primary" onClick={handleShow} hidden></Button>
-            <Modal show={show} onHide={handleClose}>
+            <Button variant="primary" onClick={() => dispatch(turnOn())} hidden ></Button>
+            <Modal show={showModal.show} onHide={() => dispatch(turnOff())}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Modal heading</Modal.Title>
+                    <Modal.Title>Modal title</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+                <Modal.Body> Sorry, we've reach the maximum number of retrievals for today (50 max). Please come try again
+                    tomorrow!</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
+                    <Button variant="secondary" onClick={() => dispatch(turnOff())}>
                         Close
                         </Button>
                 </Modal.Footer>
             </Modal>
 
             <div className="main">
-                <div className="container my-5">
+                <div className="container my-5" onSubmit={(e) => e.stopPropagation()}>
                     <h1 className="text-muted text-center my-4">Weather App</h1>
 
                     <form className="change-location my-4 text-center text-muted" onSubmit={(e) => {
-                        e.stopPropagation()
                         submitWeather(e)
                     }}>
                         <label htmlFor="city" className="smol">Enter a location</label>
                         <input type="input" name="city" className="form-control p-4 searchbar" placeholder="Enter a City" autoComplete="off" />
                     </form>
                     {renderWeather()}
+                </div>
+                <div className="d-flex align-items-end" style={{ height: "55vh" }}>
+                    <img src={logo} alt="acuweather" width="150px" />
                 </div>
             </div>
         </>
