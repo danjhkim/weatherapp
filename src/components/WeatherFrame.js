@@ -107,7 +107,7 @@ const WeatherFrame = () => {
                     </form>
                     {renderWeather()}
                 </div>
-                <div className="d-flex align-items-end" style={{ height: "55vh" }}>
+                <div className="ender" style={{ height: `${!weathers ? "60%" : "auto"}` }}>
                     <img src={logo} alt="acuweather" width="150px" />
                 </div>
             </div>
