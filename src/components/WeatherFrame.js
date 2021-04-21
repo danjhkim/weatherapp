@@ -2,12 +2,13 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap'
 import gsap, { TweenMax } from "gsap";
+import Lottie from 'react-lottie';
 
 import { combinedWeather, turnOff, turnOn } from '../actions/'
-import day from '../images/day.svg'
-import night from '../images/night.svg'
 import * as ALL from "../images/icons/"
 import logo from '../images/logo.png'
+import nightLottie from '../images/night.json'
+import dayLottie from '../images/day.json'
 
 gsap.config({
     autoSleep: 60,
@@ -16,6 +17,24 @@ gsap.config({
     units: { left: "%", top: "%", rotation: "rad" }
 });
 
+const nightTime = {
+    loop: true,
+    autoplay: true,
+    animationData: nightLottie,
+    rendererSettings: {
+        preserveAspectRatio: 'xMidYMid slice'
+    }
+};
+
+const dayTime = {
+    loop: true,
+    autoplay: true,
+    animationData: dayLottie,
+    rendererSettings: {
+        preserveAspectRatio: 'xMidYMid slice'
+    }
+};
+
 const WeatherFrame = () => {
     const dispatch = useDispatch();
     const weathers = useSelector(state => state.weathers);
@@ -23,9 +42,7 @@ const WeatherFrame = () => {
     const circleIcon = useRef()
     const mainBox = useRef()
     const littleBox = useRef()
-
     const showModal = useSelector(state => state.getSwitch)
-
 
     const submitWeather = (e) => {
         e.preventDefault()
@@ -44,6 +61,25 @@ const WeatherFrame = () => {
         }
     };
 
+    const renderanimation = () => {
+        if (weathers[city].IsDayTime) {
+            return (
+                <Lottie options={dayTime}
+                    height={'50vmin'}
+                    width={'80vmin'}
+                />
+            )
+        } else {
+            return (
+                <Lottie options={nightTime}
+                    height={'50vmin'}
+                    width={'80vmin'}
+                />
+            )
+        }
+
+    }
+
     const renderWeather = () => {
         if (weathers === null || weathers[city] === undefined) {
             return
@@ -54,7 +90,10 @@ const WeatherFrame = () => {
                         <img ref={circleIcon} alt="placeholder" src={ALL[`file${weathers[city].WeatherIcon}`].default}></img>
                     </div>
                     <div className="totalshadow" style={{ background: weathers[city].IsDayTime ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.5)' }}></div>
-                    <img alt="weather" className="time card-img-top" src={weathers[city].IsDayTime ? `${day}` : `${night}`}></img>
+                    <div className="time card-img-top">
+                        {renderanimation()}
+                    </div>
+                    {/* <img alt="weather" className="time card-img-top" src={weathers[city].IsDayTime ? `${day}` : `${night}`}></img> */}
                     <div className="text-uppercase details" style={{ color: weathers[city].IsDayTime ? 'black' : 'white' }} ref={littleBox}>
                         <h5 className="my-3">{weathers[city].city}</h5>
                         <div className="my-3 smol">{weathers[city].WeatherText}</div>
@@ -107,7 +146,7 @@ const WeatherFrame = () => {
                     </form>
                     {renderWeather()}
                 </div>
-                <div className="ender" style={{ height: `${!weathers ? "60%" : "auto"}` }}>
+                <div className="ender" style={{ height: `${!weathers ? "57%" : "auto"}` }}>
                     <img src={logo} alt="acuweather" width="150px" />
                 </div>
             </div>

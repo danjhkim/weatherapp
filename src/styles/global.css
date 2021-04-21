@@ -83,10 +83,10 @@ body {
 }
 
 .ender {
-    height:60%;
     display:flex;
     justify-content: flex-end;
     align-items: flex-end;
+    position: sticky;
 }
 
 /* ============================= */

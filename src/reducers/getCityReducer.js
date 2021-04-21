@@ -8,3 +8,4 @@ const getCityReducer = (state = {}, action) => {
 }
 
 export default getCityReducer
+
