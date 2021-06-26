@@ -34,6 +34,7 @@ body {
     justify-content: center;
     align-items: center;
     border:none;
+    background-color: green;
 }
 
 .smol {
@@ -66,7 +67,8 @@ body {
 
 .time {
     position: relative;
-    object-fit: cover;
+    width:100%;
+    height:100%;
 }
 
 .totalshadow {
@@ -80,6 +82,7 @@ body {
 .card img {
     width:100%;
     height:100%;
+    object-fit: cover;
 }
 
 .ender {
